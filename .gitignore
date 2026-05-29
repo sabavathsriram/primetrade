@@ -1,0 +1,29 @@
+# ── Environment variables (NEVER commit these) ──────────────────────────────
+.env
+.env.local
+.env.production
+.env.*
+!.env.example
+
+# ── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# ── Build output ──────────────────────────────────────────────────────────────
+frontend/dist/
+frontend/.vite/
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
