@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 
-const API = 'http://localhost:5000/api';
+// In production (Vercel) the API is on the same domain, so use a relative path.
+// In local dev, Vite proxies /api → localhost:5000 (see vite.config.js).
+const API = '/api';
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();

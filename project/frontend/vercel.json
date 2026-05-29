@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/api/register", "destination": "/api/register" },
+    { "source": "/api/login",    "destination": "/api/login"    },
+    { "source": "/api/me",       "destination": "/api/me"       },
+    { "source": "/(.*)",         "destination": "/index.html"   }
+  ]
+}
