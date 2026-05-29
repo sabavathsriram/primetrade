@@ -1,0 +1,28 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: #e5e5e5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  /* Mobile-first: centered card on desktop, full-width on mobile */
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #f7f7f8;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.app-shell {
+  width: 100%;
+  min-height: 100vh;
+}
