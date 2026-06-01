@@ -16,7 +16,7 @@ A REST API built with Node.js, Express, and MongoDB. Supports JWT authentication
 ## Project Structure
 
 ```
-educaseIndia/
+primetrade/
 ├── backend/
 │   ├── middleware/
 │   │   ├── auth.js        # requireAuth + requireAdmin
@@ -50,14 +50,7 @@ cd backend
 npm install
 ```
 
-Create a `.env` file:
 
-```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-PORT=5000
-FRONTEND_URL=http://localhost:5173
-```
 
 ```bash
 npm run dev
