@@ -1,26 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Auth.css';
+import { useNavigate, Link } from 'react-router-dom';
 
-// Uses env variable in production (Render), falls back to /api for Vercel or local dev
 const API = import.meta.env.VITE_API_URL || '/api';
 
 export default function Register({ onLogin }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
-    password: '',
-    companyName: '',
-    isAgency: 'yes',
-  });
+  const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'user' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
     setError('');
   }
 
@@ -28,167 +18,72 @@ export default function Register({ onLogin }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const res = await fetch(`${API}/register`, {
+      const res  = await fetch(`${API}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          phone: form.phone,
-          email: form.email,
-          password: form.password,
-          companyName: form.companyName,
-          isAgency: form.isAgency === 'yes',
-        }),
+        body: JSON.stringify(form),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || 'Registration failed.');
-        return;
-      }
+      if (!res.ok) { setError(data.message || 'Registration failed.'); return; }
 
       localStorage.setItem('popx_token', data.token);
       localStorage.setItem('popx_user', JSON.stringify(data.user));
       onLogin(data.user);
-      navigate('/account');
+
+      // redirect based on role
+      navigate(data.user.role === 'admin' ? '/admin' : '/user', { replace: true });
     } catch {
-      setError('Could not connect to server. Make sure the backend is running.');
+      setError('Could not connect to server.');
     } finally {
       setLoading(false);
     }
   }
 
-  const isReady =
-    form.fullName.trim() &&
-    form.phone.trim() &&
-    form.email.trim() &&
-    form.password.trim();
-
   return (
-    <div className="auth-container">
-      <h1 className="auth-heading">
-        Create your<br />PopX account
-      </h1>
+    <div style={s.page}>
+      <div style={s.card}>
+        <h2 style={s.title}>Create account</h2>
 
-      <form onSubmit={handleSubmit} noValidate>
-        <div className="field-group">
-          <label className="field-label" htmlFor="fullName">
-            Full Name<span className="required">*</span>
-          </label>
-          <input
-            id="fullName"
-            name="fullName"
-            type="text"
-            className="field-input"
-            placeholder="Marry Doe"
-            value={form.fullName}
-            onChange={handleChange}
-            autoComplete="name"
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <label style={s.label}>Full Name</label>
+          <input name="fullName" type="text" style={s.input} placeholder="Jane Doe"
+            value={form.fullName} onChange={handleChange} autoComplete="name" />
 
-        <div className="field-group">
-          <label className="field-label" htmlFor="phone">
-            Phone number<span className="required">*</span>
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            className="field-input"
-            placeholder="+91 00000 00000"
-            value={form.phone}
-            onChange={handleChange}
-            autoComplete="tel"
-          />
-        </div>
+          <label style={s.label}>Email</label>
+          <input name="email" type="email" style={s.input} placeholder="you@example.com"
+            value={form.email} onChange={handleChange} autoComplete="email" />
 
-        <div className="field-group">
-          <label className="field-label" htmlFor="reg-email">
-            Email address<span className="required">*</span>
-          </label>
-          <input
-            id="reg-email"
-            name="email"
-            type="email"
-            className="field-input"
-            placeholder="marry@example.com"
-            value={form.email}
-            onChange={handleChange}
-            autoComplete="email"
-          />
-        </div>
+          <label style={s.label}>Password</label>
+          <input name="password" type="password" style={s.input} placeholder="At least 6 characters"
+            value={form.password} onChange={handleChange} autoComplete="new-password" />
 
-        <div className="field-group">
-          <label className="field-label" htmlFor="reg-password">
-            Password<span className="required"> *</span>
-          </label>
-          <input
-            id="reg-password"
-            name="password"
-            type="password"
-            className="field-input"
-            placeholder="Create a password"
-            value={form.password}
-            onChange={handleChange}
-            autoComplete="new-password"
-          />
-        </div>
+          <label style={s.label}>Role</label>
+          <select name="role" style={s.input} value={form.role} onChange={handleChange}>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
 
-        <div className="field-group">
-          <label className="field-label" htmlFor="companyName">Company name</label>
-          <input
-            id="companyName"
-            name="companyName"
-            type="text"
-            className="field-input"
-            placeholder="Your company"
-            value={form.companyName}
-            onChange={handleChange}
-          />
-        </div>
+          {error && <p style={s.error}>{error}</p>}
 
-        <div className="field-group">
-          <p className="field-label agency-label">
-            Are you an Agency?<span className="required">*</span>
-          </p>
-          <div className="radio-group">
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="isAgency"
-                value="yes"
-                checked={form.isAgency === 'yes'}
-                onChange={handleChange}
-              />
-              Yes
-            </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="isAgency"
-                value="no"
-                checked={form.isAgency === 'no'}
-                onChange={handleChange}
-              />
-              No
-            </label>
-          </div>
-        </div>
+          <button type="submit" style={s.btn} disabled={loading}>
+            {loading ? 'Creating…' : 'Create Account'}
+          </button>
+        </form>
 
-        {error && <p className="error-msg">{error}</p>}
-
-        <button
-          type="submit"
-          className={`btn btn-submit ${isReady ? 'active' : ''}`}
-          disabled={!isReady || loading}
-        >
-          {loading ? 'Creating…' : 'Create Account'}
-        </button>
-      </form>
+        <p style={s.footer}>Already registered? <Link to="/login">Sign in</Link></p>
+      </div>
     </div>
   );
 }
+
+const s = {
+  page:   { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' },
+  card:   { background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: '36px 32px', width: '100%', maxWidth: 360 },
+  title:  { fontSize: '1.2rem', fontWeight: 700, marginBottom: 22 },
+  label:  { display: 'block', fontSize: '0.78rem', fontWeight: 600, color: '#555', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.04em' },
+  input:  { display: 'block', width: '100%', padding: '9px 12px', border: '1px solid #ddd', borderRadius: 6, fontSize: '0.9rem', marginBottom: 16, outline: 'none', fontFamily: 'inherit' },
+  error:  { fontSize: '0.82rem', color: '#c00', marginBottom: 12 },
+  btn:    { width: '100%', padding: '10px', background: '#111', color: '#fff', border: 'none', borderRadius: 7, fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', marginTop: 4 },
+  footer: { marginTop: 18, fontSize: '0.82rem', color: '#888', textAlign: 'center' },
+};
